@@ -99,26 +99,51 @@
         
         function drawMap(dataLayer){
             
-            var breaks = getClassBreaks();
+            var breaks = getClassBreaks(dataLayer);
             
             dataLayer.eachLayer(function(layer){
                 layer.setStyle({
-                    fillColor: getColor(layer.feature.properties['OWNED_MORT'], breaks)
+                    fillColor: getColor(layer.feature.properties['OWNED_MORT']/
+                                        layer.feature.properties['OWNER'], breaks)
                 })
                     
                 
             });
         }
         
-       function getClassBreaks() {
+       function getClassBreaks(dataLayer) {
+          
+           var values = [];
+          
+           dataLayer.eachLayer(function(layer){
                 
-                
-            }                    
-        function getColor(d, breaks){
+           values.push(layer.feature.properties['OWNED_MORT']/layer.feature.properties['OWNER'])
+              
+          });
+           
+           var clusters = ss.ckmeans(values,5)
+           var breaks = clusters.map(function(cluster){
+               return[cluster[0], cluster.pop()];
+           })
+           return breaks;
+           
+        }  
+        
+        function getColor(d, breaks) {
+            if(d <= breaks[0][1]) {
+            return '#edf8e9';
+        } else if(d <= breaks[1][1]) {
+            return '#bae4b3';
+        } else if(d <= breaks[2][1]) {
+            return '#74c476';
+        } else if(d <= breaks[3][1]) {
+            return '#31a354'
+        } else if(d <= breaks[4][1]) {
+            return '#006d2c'
+        }}
+        
             
-            return'yellow';
-            
-        }
+        
      
        
 
