@@ -144,6 +144,12 @@
                 
             });
             
+            dataLayer.eachLayer(function (layer) {
+            layer.bindPopup("<b>" + layer.feature.properties['NAME'] + ' County,' + "</b><br>" + ' Percentage of Renters ' +
+            "</b>: " +(layer.feature.properties['TOTAL']/layer.feature.properties['RENTER']*10).toLocaleString());
+                            
+        });
+
             drawLegend(breaks);
         }
         
@@ -204,11 +210,6 @@
             
            
                     return div;
-                
-                function onEachFeature(feature, layer){
-                    layer.bindPopup("<b>" + feature.properties['Name'] + "</b><br>" + "<b>Percent Renters</b>:" + 
-                           (breaks[i][0]*10).toLocaleString() );
-                }
                 
                  };
            
