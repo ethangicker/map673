@@ -90,7 +90,7 @@
 <body>
     <header>
         <h1>Rental Rates</h1>
-        <h2>Housing Unites Rented</h2>
+        <h2>Housing units occupied by renters</h2>
     </header>
 
     <div id='map'></div>
@@ -98,7 +98,11 @@
     <footer>
         <p>Map authored by Ethan Gicker</p>
         <p>These data were obtained through American Fact Finder (http://factfinder.census.gov/); 2010 Census, SF1.</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
+        <p>The purpose of this map is to illustrate the percentage of renters compared to the total number of housing units in Kentucky.  I could have also looked at renters compared to the total occupied units but I wanted the broadest overview of the housing market.
+            This map uses the ck means statistical method that groups data sets into homogenous clusters.  This creates an even gradation of clusters making it easier to color and interpret.  The color of the map plays an enormous roll on the way a view perceives the data.  I wanted to stay away from red or blue because of the current wave of political election maps.  Green is predictably used for environmental subjects but it seemed a good match for housing as well. If I wanted to highlight some particular point like the lack of migrant housing or housing affordability I would opt for a more aggressive color, orange or red.
+            I don’t believe that this map has a particular bias; we all bring our own implicit bias into our projects though.  Because I have never been to Kentucky and am not particularly familiar with the housing situation there I don’t bring much to this beyond the data.  If I were to do this same project with a California data set I would most certainly use it to support an argument. 
+      
+
         </p>
     </footer>
 
@@ -204,7 +208,7 @@
                     div.innerHTML +=
             '<span style="background:' + color + '"></span> ' + 
                         '<lable>'+(breaks[i][0]*10).toLocaleString() + '&mdash;' + 
-                            (breaks[i][0]*10).toLocaleString() + '</lable>';
+                            (breaks[i][1]*10).toLocaleString() + '</lable>';
                 
                 }
             
