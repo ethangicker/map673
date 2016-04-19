@@ -112,7 +112,7 @@
         <label>Choose a data attribute:</label>
         <select id="vacant">
             <option value="VACANT_FOR" selected>vacant units for rent</option>
-            <option value="VACANT_FO2">vacant units, for sale</option> 
+            <option value="VACANT_FO2">vacant units for sale</option> 
             <option value="VACANT_SEA">vacant units used seasonally or for recreational use only</option>
         </select>
     </div>
@@ -134,10 +134,10 @@
             zoomControl: false
         }
         
+        
         var map = L.map('map', options);
         
-        
-        
+    
        
        // map.addControl( L.control.zoom({ position: 'topright' }));
         
@@ -147,6 +147,15 @@
             attribute = "VACANT_FOR",
             norm = "VACANT";
         
+        var messaging_legend_attr = {
+            'VACANT_FOR': 'Vacant units for Rent',
+            'VACANT_FO2': 'vacant units for sale',
+            'VACANT_SEA': 'vacant units used seasonally or for recreational use'
+        };
+        
+        var messaging_legend_norm = {
+            'VACANT': 'Vacant units'
+        };
        
         
         
@@ -158,7 +167,7 @@
                     return {
                             color: '#636363',
                             weight: 1,
-                            fillOpacity: 1,
+                            fillOpacity: 2,
                             fillColor: '#1f78b4'
                         };
                 }          
@@ -168,9 +177,9 @@
             
             drawLegend(); // draws one legend, up here with the other one time calls.
             
-            drawMap();  
+            drawMap();  // more one time calls
             
-            drawInfo();
+            drawInfo(); // more one time calls
         
         });
         
@@ -259,15 +268,15 @@
         function getColor(d, breaks) {
             
             if(d <= breaks[0][1]) {
-                return '#ffffd4';
+                return '#f0f9e8';
             } else if(d <= breaks[1][1]) {
-                return '#fed98e';
+                return '#bae4bc';
             } else if(d <= breaks[2][1]) {
-                return '#fe9929';
+                return '#7bccc4';
             } else if(d <= breaks[3][1]) {
-                return '#d95f0e'
+                return '#43a2ca'
             } else if(d <= breaks[4][1]) {
-                return '#993404'
+                return '#0868ac'
             }
         }
         
@@ -299,7 +308,7 @@
             var legend = $('.legend');
             
             //jquary method 
-            legend.html("<h3>" + attribute + " per " + norm + "</h3>"); 
+            legend.html("<h3>" + messaging_legend_attr[attribute] + " per " +messaging_legend_norm[norm] + "</h3>"); 
 
                 for (var i = 0; i < breaks.length; i++) {
             
