@@ -79,15 +79,32 @@
         .leaflet-popup-content {
             max-width: 160px;   
         }
+        #ui-controls{
+            margin-left: 10%;
+        }
+        #ui-controls lable {
+            font-size: 1.1em;
+            margin-right: 10px;
+        }
+        
         
     </style>
 </head>
-
+    
 <body>
     <header>
         <h1>Map Title</h1>
         <h2>Map Subtitle</h2>
     </header>
+    
+    <div id='ui-controls'>
+        <label>Choose a data attribute:</label>
+        <select id="occupied">
+            <option value="OWNED_MORT" selected>owned with mortgage</option>
+            <option value="OWNED_FREE">owned free and clear</option> 
+            <option value="RENTER">rented</option>
+        </select>
+    </div>
 
     <div id='map'></div>
 
@@ -105,13 +122,22 @@
             zoom: 7.4,
             zoomControl: false
         }
+        
+        
         var map = L.map('map', options);
         
+       
         map.addControl( L.control.zoom({ position: 'topright' }));
+        
+       
         
         var dataLayer,
             attribute = "OWNED_MORT",
             norm = "OCCUPIED";
+        
+       
+        
+        
         
         $.getJSON("ky_counties_housing.json", function(data) {
             
@@ -127,8 +153,17 @@
             }).addTo(map);
             
             drawMap();
+            
+            buildUI(); //calling build UI funtion here beacuse I only wanted it to happen once.
+            
+             drawLegend(); // draws one legend, up here with the other one time calls.
               
         });
+        
+        
+        
+        
+        
         
         function drawMap() {
             
@@ -147,8 +182,14 @@
                                 ((props[attribute]/props[norm])*100).toLocaleString()+"%");  
             });
             
-            drawLegend(breaks);
+            updateLegend(breaks);
+            
         }
+        
+        
+        
+        
+        
         
         function getClassBreaks() {
             
@@ -169,6 +210,10 @@
             
         }   
         
+        
+        
+        
+        
         function getColor(d, breaks) {
             
             if(d <= breaks[0][1]) {
@@ -184,7 +229,10 @@
             }
         }
         
-        function drawLegend(breaks) {
+       
+        
+        
+        function drawLegend() {
             
             var legend = L.control({position: 'topleft'});
 
@@ -192,17 +240,6 @@
                 
                 var div = L.DomUtil.create('div', 'legend');
                 
-                div.innerHTML = "<h3>" + attribute + " per " + norm + "</h3>"; 
-
-                for (var i = 0; i < breaks.length; i++) {
-            
-                    var color = getColor(breaks[i][0], breaks);
-                    
-                    div.innerHTML +=
-                        '<span style="background:' + color + '"></span> ' +
-                        '<label>'+(breaks[i][0]*100).toLocaleString() + ' &mdash; ' + 
-                        (breaks[i][1]*100).toLocaleString() + '</label>';
-                }
                
                 return div;
                 
@@ -211,7 +248,62 @@
 
             legend.addTo(map);
         }
+        
+        
+        
+        
+        function updateLegend(breaks){
+            //.for class
+            var legend = $('.legend');
+            
+            //jquary method 
+            legend.html("<h3>" + attribute + " per " + norm + "</h3>"); 
 
+                for (var i = 0; i < breaks.length; i++) {
+            
+                    var color = getColor(breaks[i][0], breaks);
+                    
+                    legend.append(
+                    '<span style="background:' + color + '"></span> ' +
+                    '<label>'+(breaks[i][0]*100).toLocaleString() + ' &mdash; ' + 
+                    (breaks[i][1]*100).toLocaleString() + '</label>');
+                }
+            
+        }
+        
+        
+        
+        
+        function buildUI(){
+            $('select[id="occupied"]').change(function() {
+                  attribute = $(this).val();                            
+                
+                drawMap();
+            });
+            
+        }
+        
+        
+        
+        
+        function drawInfo(){
+            var info = L.control( {position: 'topright'} );
+            
+            info.onAdd = function(map){
+                
+                var div = L.DomUtil.creat('div','info');
+                
+                return div;
+            }
+            
+            
+        }
+        
+        
+        
+        
+        
+        
     </script>
     
 </body>
