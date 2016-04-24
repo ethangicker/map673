@@ -104,11 +104,10 @@
     
 <body>
     <header>
-        <h1>Map Title</h1>
-        <h2>Map Subtitle</h2>
+        <h1>Vacant Housing Units</h1>
     </header>
     
-    <div id='ui-controls'>
+    <div id='ui-controls'> 
         <label>Choose a data attribute:</label>
         <select id="vacant">
             <option value="VACANT_FOR" selected>vacant units for rent</option>
@@ -120,21 +119,21 @@
     <div id='map'></div>
 
     <footer>
-        <p>Map authored by YOUR NAME</p>
-        <p>Additional information about the data and map goes here.</p>
+        <p>Map authored by Ethan Gicker</p>
+        <p>These data were obtained through American Fact Finder(http://factfinder.census.gov/); 2010 Census, SF1.</p>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis urna magna, maximus nec laoreet sit amet, dictum ultricies nibh. Ut id auctor lacus. Nam a dolor et justo luctus luctus. Duis a elit eget risus dictum vehicula id eu elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Sed sed enim nisl. Vestibulum commodo imperdiet lacus, sed facilisis erat placerat sit amet. Nulla consequat malesuada neque eget aliquet. Integer non convallis nisl, gravida ultrices ex. Fusce nec vestibulum elit. Sed elementum lectus ipsum, vulputate elementum ex laoreet a. Aenean eu ex varius, varius felis vitae, efficitur nulla. Quisque pretium laoreet ante, in sodales dui vehicula at. Mauris eu sem sapien.
         </p>
     </footer>
 
     <script>
-        
+        //sets map options
         var options = {
             center: [37.8, -85.8],
             zoom: 7.4,
             zoomControl: false
         }
         
-        
+        //creates the leaflet map variable and passes the options to it
         var map = L.map('map', options);
         
     
@@ -142,28 +141,30 @@
        // map.addControl( L.control.zoom({ position: 'topright' }));
         
        
-        
+        //names global variables 
         var dataLayer,
             attribute = "VACANT_FOR",
             norm = "VACANT";
         
+        //names variables in human language for the legend display
         var messaging_legend_attr = {
             'VACANT_FOR': 'Vacant units for Rent',
             'VACANT_FO2': 'vacant units for sale',
             'VACANT_SEA': 'vacant units used seasonally or for recreational use'
         };
-        
+        //names more variables for the legend
         var messaging_legend_norm = {
             'VACANT': 'Vacant units'
         };
        
         
-        
-        
+        //This function happens once
+        // Jquary request from the geojson file
         $.getJSON("ky_counties_housing.json", function(data) {
             
+            //creates leaflet data layer from the external geojson file
             dataLayer = L.geoJson(data, {
-                 style: function(feature) {
+                 style: function(feature) {//styles the data layer
                     return {
                             color: '#636363',
                             weight: 1,
@@ -171,7 +172,7 @@
                             fillColor: '#1f78b4'
                         };
                 }          
-            }).addTo(map);
+            }).addTo(map); //adds the above data layer and styles to the map
             
             buildUI(); //calling build UI funtion here beacuse I only wanted it to happen once.
             
@@ -190,41 +191,47 @@
         
         
         function drawMap() {
-            
+           
+            // calls the class breaks function and gives it the name breaks
             var breaks = getClassBreaks();
-
+            
+            //loops through the geojson layer
             dataLayer.eachLayer(function(layer) {
                 
+                //asings the variable for layer properties
                 var props = layer.feature.properties;
                 
+                //sets the style of the layer based on the attribute 
                 layer.setStyle({
                     fillColor: getColor(props[attribute]/
                                         props[norm], breaks)
                 });
+                //binds the popup to the layer and calculates it to show a readable number 
                 layer.bindPopup("<b>"+props["NAME"]+" County</b></br>" +
                                 attribute + ": " +
                                 ((props[attribute]/props[norm])*100).toLocaleString()+"%"); 
                 
+                //creates the mouse over effect
                 layer.on('mouseover', function(){
                     
-                    $('.info').show();
+                    $('.info').show(); // uses jquary$ to get county information, then showes it in the info                            window
                     
                     updateInfo(layer)
                 });
                 
                 layer.on('mouseout', function(){
                     
-                    $('.info').hide();
+                    $('.info').hide(); //hides the information in the info window
                     
                 });
                 
-                 layer.on('mouseover', function() {
+                 layer.on('mouseover', function() {//highlights the county when you mouse over it
                     layer.setStyle({
                         color: '#252525',
                         weight: 3,
                     });
                 });
-                layer.on('mouseout', function() {
+                layer.on('mouseout', function() {//turns the highlighing off and resets the style the way it was
                     layer.setStyle({
                         color: '#636363',
                         weight: 1,
@@ -233,7 +240,7 @@
                 
             });
             
-            updateLegend(breaks);
+            updateLegend(breaks);// calls the update legend function
             
         }
         
@@ -244,19 +251,27 @@
         
         function getClassBreaks() {
             
-            var values = [];
+            var values = [];// creates an empty array to hold the values
             
+            //loops though each layer
             dataLayer.eachLayer(function(layer) {
+                
+                //calculates the layers values then divides it my the nomralizer
                 var value = layer.feature.properties[attribute]/layer.feature.properties[norm];
+                
+                //puts the calculated figurs into our empty array
                 values.push(value);   
             }); 
            
+            // uses outside libary simple statistics to create clusters 
             var clusters = ss.ckmeans(values, 5);
 
+            //returns array values low to high 
             var breaks = clusters.map(function(cluster){
                 return [cluster[0],cluster.pop()];   
             });
 
+            //returns the array of arrays, chloropleth bread and butter 
             return breaks;
             
         }   
@@ -264,7 +279,7 @@
         
         
         
-        
+        // this takes the above normalized data value and using conditional logic gives it a color
         function getColor(d, breaks) {
             
             if(d <= breaks[0][1]) {
@@ -282,13 +297,15 @@
         
        
         
-        
+        //this build an empty legend to be fill in later
         function drawLegend() {
             
+            // leaflet object and location
             var legend = L.control({position: 'topleft'});
 
             legend.onAdd = function () {
                 
+                //this creates a HTML div called legend
                 var div = L.DomUtil.create('div', 'legend');
                 
                
@@ -297,6 +314,7 @@
                     
             };
 
+            //adds the empty legend to the map
             legend.addTo(map);
         }
         
