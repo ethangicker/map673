@@ -214,9 +214,9 @@
                 //creates the mouse over effect
                 layer.on('mouseover', function(){
                     
-                    $('.info').show(); // uses jquary$ to get county information, then showes it in the info                            window
+                    $('.info').show(); // uses jquary$ to get county information, then showes it in the info                            //window
                     
-                    updateInfo(layer)
+                    updateInfo(layer)//changes the info window
                 });
                 
                 layer.on('mouseout', function(){
@@ -322,16 +322,19 @@
         
         
         function updateLegend(breaks){
-            //.for class
+            
+            //'.'for class, assign variable legend to jquary class 
             var legend = $('.legend');
             
-            //jquary method 
+            //jquary method attached h3 tag using the messaging var. 
             legend.html("<h3>" + messaging_legend_attr[attribute] + " per " +messaging_legend_norm[norm] + "</h3>"); 
-
+                //cycles through each of the breaks
                 for (var i = 0; i < breaks.length; i++) {
-            
+                    
+                    //sets the color for each class break
                     var color = getColor(breaks[i][0], breaks);
                     
+                    //adds the color swatch <span> tag, labels each span tag with the rounded string value of the                     //class breaks
                     legend.append(
                     '<span style="background:' + color + '"></span> ' +
                     '<label>'+(breaks[i][0]*100).toLocaleString() + ' &mdash; ' + 
@@ -342,49 +345,52 @@
         
         
         
-        
+        //creates the UI drop down menue
         function buildUI(){
-            $('select[id="vacant"]').change(function() {
-                  attribute = $(this).val();                            
+            
+            //jquary[]uses for ID,
+            $('select[id="vacant"]').change(function() {//event handler, fires when somebody chooses the attribute
+                  attribute = $(this).val();//gets the value of a set of elements                            
                 
-                drawMap();
+                drawMap(); //redraws the map with the new user data
             });
             
         }
         
         
         
-        
+        //creates a empty info window 
         function drawInfo(){
-            var info = L.control( {position: 'topright'} );
+            var info = L.control( {position: 'topright'} );// assigns a varriable info, gives us control to park                //it in the possition of our choosing
             
             info.onAdd = function(map){
                 
-                var div = L.DomUtil.create('div','info');
+                var div = L.DomUtil.create('div','info');//creates a DOM element with a class of Div and Info
                 
                 return div;
             }
             
-            info.addTo(map);
+            info.addTo(map); //adds it to the map
             
-            $('.info').hide();
+            $('.info').hide(); //use Jquary to hide the info window when we mouse off the map
         }
         
         
         
         
-        
+        //populates our empty info window
         function updateInfo(layer){
             
             var props = layer.feature.properties;
             
+            // uses html elements + the ID and classes
             var html = "<h3>"+props.NAME +" County</h3>"+
                 "total # vacant units: <b>"+ props.VACANT+"</b><br>"+
                 "# vacant units for rent: <b>"+ props.VACANT_FOR +"</b><br>"+
                 "# vacant units, for sale only: <b>"+ props.VACANT_FO2 +"</b><br>"+
                 "# vacant units used seasonally or for recreational use only: <b>"+ props.VACANT_SEA +"</b>"
 
-             $(".info").html(html);
+             $(".info").html(html);//turns our jquary info into html element
             
         }
         
