@@ -127,57 +127,49 @@
                 
         // declare global variables
         var dataLayer,
-            attribute = 
+            attribute = '2000';
         
 
         // AJAX requests to load data files
         //brings in the geojson data and adds it to the map
-        $.getJSON('ky-counties', function(data){
-            console.log(data);
-            //brings in our cvs
-            Papa.parse('states-unemployment.csv',{
+        $.getJSON('ky-counties.json', function(geoCounties){
+             
+            Papa.parse('ky-unemployment-data.csv',{
                 download : true, //maintains the format of the cvs
                 header : true,
-                complete : function(data) {
-                    
-                    processData(states, data)//function call
-                    
+                complete : function(csvData) { 
+                    processData(geoCounties, csvData)//function call
                 }
                        
             })
             
         });
  
+      
         // function to process/bind data
-        
-        function processData( states, data){
+        function processData(geoCounties,csvData){
             
-            for(var state in states.features){ //looping structure to loop through the arrays of states
-               
-                 var props = states.features[state].properties;
-                 
-                    for(d in data.data){//loops through the data
-                    
-                        //matches csv fips code with json fips code 
-                        if(props.STATEFP === data.data[d].STATE_FIP) {
-                        
-                            states.features[state].properties = data.data[d];
+            for(var county in geoCounties.features){
+          
+                var props = geoCounties.features[county].properties;
+            //console.log(geoCounties.features[county].properties);
+            
+            for(d in csvData.data){
+                
+                if(props.NAME === csvData.data[d].NAME){
+                   
+                    geoCounties.features[county].properties = csvData.data[d];
                             break;
-                        
-                        }
-                    }//end of inner for loop
-            
-                }//end of outer for loop
-            
-                drawMap(states);
+                }
             }
-
-        
+        }
+            drawMap(geoCounties);
+    }
         
         // function to draw the map
-        function drawMap(states){
+        function drawMap(geoCounties){
             
-            dataLayer = L.geoJson(states,{ //convert json to leaflet
+            dataLayer = L.geoJson(geoCounties,{ //convert json to leaflet
                 style : function(feature){
                     //console.log(feature);
                     return {
@@ -213,9 +205,9 @@
         }
         
         
-        
-        // function get the class breaks  
-        function getClassBreaks(){
+      
+        // function get the class breaks 
+         function getClassBreaks(){
             
             var values = [];
             
@@ -229,8 +221,7 @@
                     return breaks;
             }
         
-        
-        
+       
         // function to get the color value
         function getColor(d, breaks){
             if(d <= breaks[1]) {
@@ -246,6 +237,7 @@
             }
         }
             
+        
                 
         // function to draw the legend
         function drawLegend(){
@@ -266,6 +258,7 @@
             
         }
         
+        
         // function to update the legend
         function updateLegend(breaks){
             var legend = $('.legend').html("<h3>% Unemployment: " + attribute+ "</h3><ul>" );
@@ -281,10 +274,10 @@
                 legend.append("</ul>")
             
         }
-        
+       
 
         // function to create the range slider
-        function createSliderUI(){
+         function createSliderUI(){
             var sliderControl = L.control({position: 'bottomleft'});
             
             sliderControl.onAdd = function(map){
@@ -302,6 +295,7 @@
                 upDateMap()
             })
         }
+        
 
     </script>
     
