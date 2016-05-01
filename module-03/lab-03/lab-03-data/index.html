@@ -24,10 +24,19 @@
         }
         header {
             padding: 6px 10%;
+            
         }
         h1 {
+            position: absolute;
+            z-index: 100;
+            top: 10px;
+            left: 60px;
             padding: 8px 15px;
-            margin: 0; 
+            margin: 0;
+            color: whitesmoke;
+            font-size: 1.5em;
+            background: rgba(25,25,25,0.8);
+            border-radius: 5px;  
         }
         #map {
             position: absolute;
@@ -45,59 +54,85 @@
         }  
         
         .legend {
-        padding: 6px 8px;
-        font-size: 1em;
-        background: rgba(75,75,75,0.8);
-        color: whitesmoke;
-        box-shadow: 0 0 15px rgba(0,0,0,0.2);
-        border-radius: 5px;
-        width: 160px;
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(75,75,75,0.8);
+            color: whitesmoke;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            width: 160px;
+    }
+        .legend label {
+            font-size: 1.1em;
+    }
+        .legend label:after {
+            content: '';
+            display: block;
+            clear: both;
     }
         .legend h3 {
-        font-size: 1.1em;
-        font-weight: bold;
-        line-height: 1em;
-        color: whitesmoke;
-        margin: 0;
+            font-size: 1.1em;
+            font-weight: bold;
+            line-height: 1em;
+            color: whitesmoke;
+            margin: 0;
     }
         .legend li {
-        list-style-type: none;
-        height: 22px;
+            list-style-type: none;
+            height: 22px;
     }
         .legend span {
-        width: 30px;
-        height: 20px;
-        float: left;
-        margin-right: 10px;
+            width: 30px;
+            height: 20px;
+            float: left;
+            margin-right: 10px;
+    }
+        .leaflet-popup-content {
+            max-width: 160px;   
     }
         #ui-controls {
-        width: 176px;   
-        padding: 8px 15px 8px 15px;
-        background: rgba(75,75,75,0.8);
-        box-shadow: 0 0 15px rgba(0,0,0,0.2);
-        border-radius: 5px; 
-        color: whitesmoke;
+            width: 176px;   
+            padding: 8px 15px 8px 15px;
+            background: rgba(75,75,75,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px; 
+            color: whitesmoke;
     }
-    .year-slider {
-        width: 100%;
+        .year-slider {
+            width: 100%;
     }
         #ui-controls .min{
             float:left;
         }
+        
         #ui-controls .max{
             float: right;
-            margin-right: -15px;
-        }
+    }
+        
+        .info {
+             padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(75,75,75,0.8);
+            color: whitesmoke;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            width: 160px;  
+    }
+        .info h3 {
+            margin: 0;
+    }
         
     </style>
 </head>
 
 <body>
-    <h1>Map Title Goes Here</h1>
+    <h1>Kentucky Unemployment 2000-2013</h1>
     <div id='map'></div>
     <div id='ui-controls'>
-        <input type='range' min='2001' max='2013' value='2001' step='1'
-               class='year-slider'
+        <label><span class="min">2000</span><span class="max">2013</span>
+        <input type="range" min = "2000", max= "2013", 
+               value = "2000", step= "1", class="year-slider"></input>
+    </label>
     
     </div>
     
@@ -116,6 +151,7 @@
         
         var map = L.map('map', options);
         // load map tiles and add to map
+        
         var tiles = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-background/{z}/{x}/{y}.{ext}', {
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a                            href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             subdomains: 'abcd',
@@ -150,19 +186,22 @@
         function processData(geoCounties,csvData){
             
             for(var county in geoCounties.features){
+                //looping structure to loop through the arrays of states
           
                 var props = geoCounties.features[county].properties;
-            //console.log(geoCounties.features[county].properties);
             
             for(d in csvData.data){
+                //loops through the data
                 
                 if(props.NAME === csvData.data[d].NAME){
                    
                     geoCounties.features[county].properties = csvData.data[d];
                             break;
                 }
-            }
-        }
+            }//end of inner loop
+        
+        }//end of outer loop
+            
             drawMap(geoCounties);
     }
         
@@ -171,7 +210,6 @@
             
             dataLayer = L.geoJson(geoCounties,{ //convert json to leaflet
                 style : function(feature){
-                    //console.log(feature);
                     return {
                         color: 'white',
                         weight: 1,
@@ -179,28 +217,73 @@
                         fillColor: '#1f78b4'
                     }
                 }
-            }).addTo(map);
-            
+            })
+                .addTo(map);
+           
+            //one time calls
+            createSliderUI();
             drawLegend();
             upDateMap();
-            createSliderUI();
+            drawInfo(); 
         }
         
         
         
         // function to update the map
-        function upDateMap(){
+                function upDateMap(){
             
-            var breaks = getClassBreaks();
+                var breaks = getClassBreaks();
             
                 
-            dataLayer.eachLayer(function(layer){
+                    dataLayer.eachLayer(function(layer){
                 
-                layer.setStyle({
-                    fillColor: getColor(Number(layer.feature.properties[attribute]), breaks)
+                        //asings the variable for layer properties
+                        var props = layer.feature.properties;
+
+                            layer.setStyle({
+                                fillColor: getColor(Number(layer.feature.properties[attribute]), breaks)
                 })
+                 
+                //binds the popup to the layer and calculates it to show a readable number 
+                layer.bindPopup("<b>"+props["NAME"]+" County</b></br>" +
+                                attribute + ": " +
+                                ((props[attribute])).toLocaleString()+"%" + ' Unemployment'); 
+                
+                
+                //creates the mouse over effect
+                layer.on('mouseover', function(){
+                    
+                    $('.info').show(); 
+                    // uses jquary$ to get county information, then showes it in the info window
+                    updateInfo(layer)//changes the info window
+                });
+                
+                
+                    layer.on('mouseout', function(){
+                    //hides the information in the info window
+                    $('.info').hide(); 
+                    
+                });
+                
+                 
+                    layer.on('mouseover', function() {
+                    //highlights the county when you mouse over it
+                     layer.setStyle({
+                        color: '#252525',
+                        weight: 3,
+                    });
+                });
+                
+                        layer.on('mouseout', function() {
+                        //turns the highlighing off and resets the style the way it was
+                        layer.setStyle({
+                        color: '#636363',
+                        weight: 1,
+                    });
+                });
                 
             });
+                
             updateLegend(breaks);
         }
         
@@ -217,7 +300,8 @@
                         values.push(value);
                 });
 
-                var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+            var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+
                     return breaks;
             }
         
@@ -225,15 +309,15 @@
         // function to get the color value
         function getColor(d, breaks){
             if(d <= breaks[1]) {
-                return '#f0f9e8';
+                return '#fee5d9';
             } else if(d <= breaks[2]) {
-                return '#bae4bc';
+                return '#fcae91';
             } else if(d <= breaks[3]) {
-                return '#7bccc4';
+                return '#fb6a4a';
             } else if(d <= breaks[4]) {
-                return '#43a2ca'
+                return '#de2d26'
             } else if(d <= breaks[5]) {
-                return '#0868ac'
+                return '#a50f15'
             }
         }
             
@@ -241,14 +325,14 @@
                 
         // function to draw the legend
         function drawLegend(){
-             // leaflet object and location
+             
             var legend = L.control({position: 'topright'});
-
-            legend.onAdd = function () {
+                // leaflet object and location
+            
+                    legend.onAdd = function () {
                 
-                //this creates a HTML div called legend
-                var div = L.DomUtil.create('div', 'legend');
-                
+                        var div = L.DomUtil.create('div', 'legend');
+                        //this creates a HTML div called legend 
                
                 return div;
                 
@@ -261,14 +345,15 @@
         
         // function to update the legend
         function updateLegend(breaks){
+            
             var legend = $('.legend').html("<h3>% Unemployment: " + attribute+ "</h3><ul>" );
             
                 for (var i=0; i< breaks.length-1; i++){
                     var color = getColor(breaks[i+1], breaks);
                         
-                    $('.legend ul').append('<li><span style="background:' + color + '"></span>'
-                            + breaks[i] + ' &mdash; '
-                                + breaks[i+1] + '</li>');
+                        $('.legend ul').append('<li><span style="background:' + color + '"></span>'
+                            + (breaks[i]).toLocaleString() + ' &mdash; '
+                                + (breaks[i+1]).toLocaleString() + '</li>');
                 
             }
                 legend.append("</ul>")
@@ -276,17 +361,23 @@
         }
        
 
-        // function to create the range slider
+         // function to create the range slider
          function createSliderUI(){
-            var sliderControl = L.control({position: 'bottomleft'});
+            
+        var sliderControl = L.control({position: 'bottomleft'});
             
             sliderControl.onAdd = function(map){
+                
                 var slider = L.DomUtil.get('ui-controls')
+                    
                     L.DomEvent.addListener(slider, 'mousedown',function(e){
-                       L.DomEvent.stopPropagation(e);                     
+                       
+                        L.DomEvent.stopPropagation(e);                     
                 });
+                
                 return slider
             }
+            
             sliderControl.addTo(map);
             
             $('.year-slider')
@@ -295,6 +386,46 @@
                 upDateMap()
             })
         }
+        
+        
+        //creates a empty info window 
+        function drawInfo(){
+            
+            var info = L.control( {position: 'bottomright'} );
+            // assings info and pannel position
+                
+                info.onAdd = function(map){
+                
+                    var div = L.DomUtil.create('div','info');
+                    //creates a DOM element with a class of Div and Info
+                
+                    return div;
+            }
+            
+                info.addTo(map); 
+                //adds it to the map
+                    
+                    $('.info').hide(); 
+                    //use Jquary to hide the info window when we mouse off the map
+        }
+        
+        
+        
+            //populates our empty info window
+            function updateInfo(layer){
+            
+                var props = layer.feature.properties;
+            
+                    // uses html elements + the ID and classes
+                    var html = "<h3>"+props.NAME +" County</h3>"+
+                        "% Unemplyed: <b>"+ props['2000']+"</b><br>"+
+                        
+                        $(".info").html(html)
+                                        
+                
+                        //turns our jquary info into html element
+           }
+        
         
 
     </script>
