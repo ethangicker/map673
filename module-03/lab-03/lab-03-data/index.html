@@ -60,7 +60,7 @@
             color: whitesmoke;
             box-shadow: 0 0 15px rgba(0,0,0,0.2);
             border-radius: 5px;
-            width: 160px;
+            width: 170px;
     }
         .legend label {
             font-size: 1.1em;
@@ -71,11 +71,12 @@
             clear: both;
     }
         .legend h3 {
-            font-size: 1.1em;
+            font-size: 1.3em;
             font-weight: bold;
             line-height: 1em;
             color: whitesmoke;
             margin: 0;
+            text-align: center;
     }
         .legend li {
             list-style-type: none;
@@ -346,14 +347,14 @@
         // function to update the legend
         function updateLegend(breaks){
             
-            var legend = $('.legend').html("<h3>% Unemployment: " + attribute+ "</h3><ul>" );
+            var legend = $('.legend').html("<h3>" + attribute+ "</h3><ul>" );
             
                 for (var i=0; i< breaks.length-1; i++){
                     var color = getColor(breaks[i+1], breaks);
                         
                         $('.legend ul').append('<li><span style="background:' + color + '"></span>'
-                            + (breaks[i]).toLocaleString() + ' &mdash; '
-                                + (breaks[i+1]).toLocaleString() + '</li>');
+                            + (breaks[i]).toLocaleString() +  '&mdash; '
+                                + (breaks[i+1]).toLocaleString() + "%" +'</li>');
                 
             }
                 legend.append("</ul>")
@@ -417,12 +418,24 @@
                 var props = layer.feature.properties;
             
                     // uses html elements + the ID and classes
-                    var html = "<h3>"+props.NAME +" County</h3>"+
-                        "% Unemplyed: <b>"+ props['2000']+"</b><br>"+
+                    var html ="<h3>"+ props.NAME + " County</h3>" +
+                        "2000: <b>"+ props['2000']+"</b><br>"+
+                        "2001: <b>"+ props['2001']+"</b><br>"+
+                        "2002: <b>"+ props['2002']+"</b><br>"+
+                        "2003: <b>"+ props['2003']+"</b><br>"+
+                        "2004: <b>"+ props['2004']+"</b><br>"+
+                        "2005: <b>"+ props['2005']+"</b><br>"+
+                        "2006: <b>"+ props['2006']+"</b><br>"+
+                        "2007: <b>"+ props['2007']+"</b><br>"+
+                        "2008: <b>"+ props['2008']+"</b><br>"+
+                        "2009: <b>"+ props['2009']+"</b><br>"+
+                        "2010: <b>"+ props['2010']+"</b><br>"+
+                        "2011: <b>"+ props['2011']+"</b><br>"+
+                        "2012: <b>"+ props['2012']+"</b><br>"+
+                        "2013: <b>"+ props['2013']+"</b><br>"
+                    
                         
                         $(".info").html(html)
-                                        
-                
                         //turns our jquary info into html element
            }
         
