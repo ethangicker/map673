@@ -161,6 +161,7 @@
             ext: 'png'
         });
             map.addLayer(tiles);
+        //loads leaflet tiles and adds them to the map
                 
         // declare global variables
         var dataLayer,
@@ -187,23 +188,24 @@
         function processData(geoCounties,csvData){
             
             for(var county in geoCounties.features){
-                //looping structure to loop through the arrays of states
+                //looping structure to loop through the arrays of counties
           
                 var props = geoCounties.features[county].properties;
             
             for(d in csvData.data){
-                //loops through the data
+                //loops through the csv data
                 
                 if(props.NAME === csvData.data[d].NAME){
+                    //matches csv data and county names
                    
                     geoCounties.features[county].properties = csvData.data[d];
-                            break;
+                            break; // breaks out of the looping structure
                 }
             }//end of inner loop
         
         }//end of outer loop
             
-            drawMap(geoCounties);
+            drawMap(geoCounties);// function call
     }
         
         // function to draw the map
@@ -237,12 +239,14 @@
             
                 
                     dataLayer.eachLayer(function(layer){
+                        //loops through the geojson layer
                 
-                        //asings the variable for layer properties
                         var props = layer.feature.properties;
+                        //asings the variable for layer properties
 
                             layer.setStyle({
                                 fillColor: getColor(Number(layer.feature.properties[attribute]), breaks)
+                                //sets the style of the layer based on the attribute 
                 })
                  
                 //binds the popup to the layer and calculates it to show a readable number 
@@ -271,7 +275,7 @@
                     //highlights the county when you mouse over it
                      layer.setStyle({
                         color: '#252525',
-                        weight: 3,
+                        weight: 4,
                     });
                 });
                 
@@ -294,20 +298,24 @@
          function getClassBreaks(){
             
             var values = [];
+             // creates an empty array to hold the values
             
                 dataLayer.eachLayer(function(layer){
-
+                //loops though each layer
+                    
                     var value = Number(layer.feature.properties[attribute]);
                         values.push(value);
+                    //puts the figurs into our empty array
                 });
 
             var breaks = ss.quantile(values, [0, 0.2, 0.4, 0.6, 0.8, 1]);
+             //establishes our breaks using simple stats.
 
                     return breaks;
             }
         
        
-        // function to get the color value
+        // function to get the color value based on the breaks above.
         function getColor(d, breaks){
             if(d <= breaks[1]) {
                 return '#fee5d9';
@@ -336,11 +344,12 @@
                         //this creates a HTML div called legend 
                
                 return div;
+                        //returns out empty div container
                 
                     
             };
                 legend.addTo(map);
-            
+                // adds it to the map
         }
         
         
@@ -348,17 +357,21 @@
         function updateLegend(breaks){
             
             var legend = $('.legend').html("<h3>" + attribute+ "</h3><ul>" );
+            ////'.'for class, assign variable legend to jquary class 
             
                 for (var i=0; i< breaks.length-1; i++){
+                     //cycles through each of the breaks
                     var color = getColor(breaks[i+1], breaks);
+                    //sets the color for each class break
                         
                         $('.legend ul').append('<li><span style="background:' + color + '"></span>'
                             + (breaks[i]).toLocaleString() +  '&mdash; '
                                 + (breaks[i+1]).toLocaleString() + "%" +'</li>');
+        //adds the color swatch <span> tag, labels each span tag with the rounded string value of the breaks
                 
             }
                 legend.append("</ul>")
-            
+            //appends the ledgend with a ul tag
         }
        
 
@@ -366,15 +379,17 @@
          function createSliderUI(){
             
         var sliderControl = L.control({position: 'bottomleft'});
+            //positions the slider using leaflet control
             
-            sliderControl.onAdd = function(map){
+             sliderControl.onAdd = function(map){
                 
                 var slider = L.DomUtil.get('ui-controls')
-                    
+                //creates a dom element with an ID and class from above.    
+                
                     L.DomEvent.addListener(slider, 'mousedown',function(e){
-                       
+                       //listens for the click events
                         L.DomEvent.stopPropagation(e);                     
-                });
+                });       //stops the click event
                 
                 return slider
             }
@@ -382,9 +397,13 @@
             sliderControl.addTo(map);
             
             $('.year-slider')
+            //jquaery access to slider
             .on('input change', function(){
+                
                 attribute = ($(this).val());
+                //gets the value of a set of elements 
                 upDateMap()
+                
             })
         }
         
@@ -396,7 +415,7 @@
             // assings info and pannel position
                 
                 info.onAdd = function(map){
-                
+            
                     var div = L.DomUtil.create('div','info');
                     //creates a DOM element with a class of Div and Info
                 
@@ -415,10 +434,13 @@
             //populates our empty info window
             function updateInfo(layer){
             
-                var props = layer.feature.properties;
+                var props = layer.feature.properties; 
+                //acceses the properties
             
-                    // uses html elements + the ID and classes
-                    var html ="<h3>"+ props.NAME + " County</h3>" +
+                    // uses html elements + the ID and classes; needs refactoring
+                    
+                    var html ="<h3>"+ props.NAME + " County</h3>" + 
+                        
                         "2000: <b>"+ props['2000']+"</b><br>"+
                         "2001: <b>"+ props['2001']+"</b><br>"+
                         "2002: <b>"+ props['2002']+"</b><br>"+
@@ -433,7 +455,6 @@
                         "2011: <b>"+ props['2011']+"</b><br>"+
                         "2012: <b>"+ props['2012']+"</b><br>"+
                         "2013: <b>"+ props['2013']+"</b><br>"
-                    
                         
                         $(".info").html(html)
                         //turns our jquary info into html element
@@ -446,3 +467,4 @@
 </body>
 
 </html>
+                        

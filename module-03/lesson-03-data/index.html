@@ -204,7 +204,7 @@
             dataLayer.eachLayer(function(layer){
                 
                 layer.setStyle({
-                    fillColor: getColor(Number(layer.feature.properties['2000']), breaks)
+                    fillColor: getColor(Number(layer.feature.properties[attribute]), breaks)
                 })
                 
             });
@@ -220,7 +220,7 @@
             
                 dataLayer.eachLayer(function(layer){
 
-                    var value = Number(layer.feature.properties['2000']);
+                    var value = Number(layer.feature.properties[attribute]);
                         values.push(value);
                 });
 
