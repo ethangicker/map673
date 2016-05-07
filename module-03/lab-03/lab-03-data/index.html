@@ -78,6 +78,9 @@
             margin: 0;
             text-align: center;
     }
+        .legend ul {
+            padding: 0 0 0 5px;
+        }
         .legend li {
             list-style-type: none;
             height: 22px;
@@ -132,7 +135,7 @@
     <div id='ui-controls'>
         <label><span class="min">2000</span><span class="max">2013</span>
         <input type="range" min = "2000", max= "2013", 
-               value = "2000", step= "1", class="year-slider"></input>
+               value = "2000", step= "1", class="year-slider">
     </label>
     
     </div>
@@ -277,6 +280,8 @@
                         color: '#252525',
                         weight: 4,
                     });
+                        
+                    layer.bringToFront(); // bring feature to front of all layers
                 });
                 
                         layer.on('mouseout', function() {
@@ -356,7 +361,7 @@
         // function to update the legend
         function updateLegend(breaks){
             
-            var legend = $('.legend').html("<h3>" + attribute+ "</h3><ul>" );
+            var legend = $('.legend').html("<h3>% unemployed: " + attribute+ "</h3><ul>" );
             ////'.'for class, assign variable legend to jquary class 
             
                 for (var i=0; i< breaks.length-1; i++){
@@ -436,28 +441,26 @@
             
                 var props = layer.feature.properties; 
                 //acceses the properties
-            
-                    // uses html elements + the ID and classes; needs refactoring
-                    
-                    var html ="<h3>"+ props.NAME + " County</h3>" + 
-                        
-                        "2000: <b>"+ props['2000']+"</b><br>"+
-                        "2001: <b>"+ props['2001']+"</b><br>"+
-                        "2002: <b>"+ props['2002']+"</b><br>"+
-                        "2003: <b>"+ props['2003']+"</b><br>"+
-                        "2004: <b>"+ props['2004']+"</b><br>"+
-                        "2005: <b>"+ props['2005']+"</b><br>"+
-                        "2006: <b>"+ props['2006']+"</b><br>"+
-                        "2007: <b>"+ props['2007']+"</b><br>"+
-                        "2008: <b>"+ props['2008']+"</b><br>"+
-                        "2009: <b>"+ props['2009']+"</b><br>"+
-                        "2010: <b>"+ props['2010']+"</b><br>"+
-                        "2011: <b>"+ props['2011']+"</b><br>"+
-                        "2012: <b>"+ props['2012']+"</b><br>"+
-                        "2013: <b>"+ props['2013']+"</b><br>"
-                        
-                        $(".info").html(html)
-                        //turns our jquary info into html element
+
+                var html ="<h3>"+ props.NAME + " County</h3>";
+
+                // get a list of the object keys
+                var keys = Object.keys(props);
+
+                // sort these strings low to high
+                keys.sort();
+
+                // loop through the array of prop keys
+                keys.forEach(function(key) {
+                    // if that key can be converted to a Number (is true)
+                    if(Number(key)) {
+                        // concatenate the new line to our output html
+                        html += key + ": <b>"+ props[key]+"</b><br>"
+                    }
+                })
+
+                $(".info").html(html)
+                //turns our jquary info into html element
            }
         
         
