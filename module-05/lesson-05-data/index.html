@@ -226,8 +226,7 @@
                         color: '#D96D02',
                         opacity: 1,
                         weight: 2,
-                        fillOpacity: 0,
-                        radius: calcRadius(feature.properties.G1)
+                        fillOpacity: 0
                     });
                 }
             
@@ -249,7 +248,7 @@
                 }
                 
             }).addTo(map);
-            //updateSymbols(boys, girls, 1);
+            updateSymbols();
             sequenceUI();
             infoWindow();
         }
