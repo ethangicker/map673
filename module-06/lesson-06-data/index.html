@@ -12,6 +12,7 @@
         height: 100%;
         padding: 0;
         margin: 0;
+        background: #3d3d3d;
       }
     </style>
 </head>
@@ -20,8 +21,76 @@
     <div id="map"></div>
 
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
-    <script>
+    <script type="cartocss/html" id=counties-styles>
+    
+    /** choropleth visualization */
 
+        #cancer_deaths_by_100_000{
+          polygon-fill: #FFFFB2;
+          polygon-opacity: 0.8;
+          line-color: #FFF;
+          line-width: 0.5;
+          line-opacity: 1;
+        }
+        #cancer_deaths_by_100_000 [ cancer_mor <= 376.2] {
+           polygon-fill: #BD0026;
+        }
+        #cancer_deaths_by_100_000 [ cancer_mor <= 214.2] {
+           polygon-fill: #F03B20;
+        }
+        #cancer_deaths_by_100_000 [ cancer_mor <= 192.2] {
+           polygon-fill: #FD8D3C;
+        }
+        #cancer_deaths_by_100_000 [ cancer_mor <= 170.8] {
+           polygon-fill: #FECC5C;
+        }
+        #cancer_deaths_by_100_000 [ cancer_mor <= 148.5] {
+           polygon-fill: #FFFFB2;
+        }
+    
+    </script>
+    <script>
+            
+        //var url = 'https://ethangicker.cartodb.com/api/v2/viz/f06f06b0-9602-11e5-880e-0ea31932ec1d/viz.json'
+        
+        var map = L.map('map',{
+            center:[-5, 4],
+            zoom: 4.5,
+        })
+        
+        //var cartoCSS = '#cancer_deaths_by_100_000{' +
+          //    'polygon-fill: #FFFFB2;' +
+            //  'polygon-opacity: 0.8;' +
+              //'line-color: #FFF;' +
+              //'line-width: 0.5;' +
+              //'line-opacity: 1;'+
+            //'}';
+        
+        var sourceObject = {
+            user_name: 'ethangicker',
+            type: 'cartodb',
+            sublayers: [
+                {
+                    sql: "SELECT ST_Transform (the_geom, 102008) AS                  the_geom_webmercator,cartodb_id,cancer_mor,county,geoid,state FROM cancer_deaths_by_100_000",
+                    cartocss: $("#counties-styles").text()
+                }
+            ]
+        };
+        
+        var tooltip = new cdb.geo.ui.Tooltip({
+                layer: layer,
+                template: '<p>{{name}}</p>', 
+                width: 200,
+                position: 'bottom|right'
+            });
+            
+            $('.map_wrapper').append(tooltip.render().el);
+        
+
+      // you could use $(window).load(main);
+      window.onload = main;
+        cartodb.createLayer(map, sourceObject).addTo(map);
+        
     </script>
 </body>
 </html>
