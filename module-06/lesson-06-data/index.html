@@ -14,11 +14,18 @@
         margin: 0;
         background: #3d3d3d;
       }
+        html, body, #map, .map_wrapper {
+        position: relative;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
     </style>
 </head>
 <body>
     
     <div id="map"></div>
+    <div class="map_wrapper">
 
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
     <script type="cartocss/html" id=counties-styles>
@@ -50,21 +57,13 @@
     
     </script>
     <script>
-            
-        //var url = 'https://ethangicker.cartodb.com/api/v2/viz/f06f06b0-9602-11e5-880e-0ea31932ec1d/viz.json'
         
         var map = L.map('map',{
-            center:[-5, 4],
+            center:[-0, 0],
             zoom: 4.5,
+            title: true,
         })
         
-        //var cartoCSS = '#cancer_deaths_by_100_000{' +
-          //    'polygon-fill: #FFFFB2;' +
-            //  'polygon-opacity: 0.8;' +
-              //'line-color: #FFF;' +
-              //'line-width: 0.5;' +
-              //'line-opacity: 1;'+
-            //'}';
         
         var sourceObject = {
             user_name: 'ethangicker',
@@ -75,21 +74,10 @@
                     cartocss: $("#counties-styles").text()
                 }
             ]
-        };
-        
-        var tooltip = new cdb.geo.ui.Tooltip({
-                layer: layer,
-                template: '<p>{{name}}</p>', 
-                width: 200,
-                position: 'bottom|right'
-            });
             
-            $('.map_wrapper').append(tooltip.render().el);
-        
-
-      // you could use $(window).load(main);
-      window.onload = main;
-        cartodb.createLayer(map, sourceObject).addTo(map);
+        };
+            cartodb.createLayer(map, sourceObject).addTo(map)
+            
         
     </script>
 </body>
