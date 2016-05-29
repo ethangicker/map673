@@ -53,6 +53,16 @@
         
         .emitter {
             fill: yellow;
+            stroke: white;
+            opacity: .7;
+        }
+        
+        .slider {
+            width: 300px;
+            margin-left: 223px;
+        }
+        #emmission-value {
+            margin-left: 223px;
         }
     </style>
 </head>
@@ -60,6 +70,8 @@
     <div id="map"></div>
     <h1>US Counties</h1>
     <h2></h2>
+    <input type="range" class="slider">
+    <div id="emmission-value"></div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
@@ -91,6 +103,19 @@
     
     function makeMap (error, counties, na, emitters){
         
+        var data = [];
+
+        emitters.forEach(function(emitter) {
+            data.push(Number(emitter.total_emissions));
+        });
+
+        var min = Math.min.apply(Math, data),
+            max = Math.max.apply(Math, data);
+
+        var radius = d3.scale.sqrt()
+                    .domain([min, max])
+                    .range([3,20])
+        
         svg.append("g")
     .selectAll("path")
     .data(na.features)
@@ -102,6 +127,9 @@
         svg.append("g")
     .selectAll("path")
     .data(topojson.feature(counties, counties.objects.counties).features)
+    .sort(function(a,b){
+            return b.propertiese.total_emissions - a.properties.total_emissions;
+        })
     .enter()
     .append("path")
     .attr("d",geoPath)
@@ -117,7 +145,7 @@
     });
         
         
-        svg.append("g")
+       var facilities = svg.append("g")
     .selectAll("circle")
     .data(emitters)
     .enter()
@@ -127,6 +155,8 @@
         
         if(d.position) {
             return d.position[0];
+        } else {
+            
         }
     })
     .attr("cy", function(d) {
@@ -135,8 +165,31 @@
             return d.position[1];
         }
     })
-    .attr("r", 1)
+    .attr("r", function(d){
+            return radius(d.total_emissions)
+        })
     .attr("class","emitter");
+        
+    var output = d3.select('#emmission-value').text(max.toLocaleString()); 
+
+        d3.select(".slider")
+            .attr("min", min)
+            .attr("max", max)
+            .attr("value", max)
+            .attr("step", (max-min)/300)
+            .on("input", function() {
+                update(this.value);
+            });
+        
+        function update(val){
+            output.text(Number(val).toLocaleString());
+
+            facilities.attr("display", function(d) {
+                if(val <= Number(d.total_emissions)) {
+                    return "none";
+        }
+    })
+}
 }
 </script>
 </body>

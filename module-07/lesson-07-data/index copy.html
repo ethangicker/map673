@@ -1,0 +1,125 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Map 673 Lesson 07 Template</title>
+
+    <link href="http://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+            background: whitesmoke;
+            font-family: Montserrat, sans-serif;
+        }
+        
+        #map {
+            width: 900px;
+            height: 600px;
+            margin: 10px auto;
+           
+        }
+        
+        h1,h2{
+            position: absolute;
+            left: 20px;
+            top: 10px;
+            font-size: 2em;
+            font-weight: 100;
+            color: #005DAA;
+                
+        }
+        
+        h2 {
+            top: 60px;
+            font-size: 1.2em;
+        }
+        
+        
+        .county {
+            stroke: #fff;
+            
+        }
+        
+        .land {
+            fill: #d3d3d3;
+        }
+        
+        
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <h1>Cancer Mortality</h1>
+    <h2>Per 100,000</h2>
+    <input type="range" class="slider">
+    <div id="emmission-value"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/0.9.0/simple_statistics.min.js"></script>
+  
+<script>
+        
+   // custom JS goes here
+    
+    var width = 900, height = 600;
+    
+    var svg = d3.select("#map")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height);
+                
+    var projection = d3.geo.albers()
+                .scale(1000)
+                .translate([width / 2, height / 2]);
+    
+    var geoPath = d3.geo.path() 
+                .projection(projection);
+    
+    queue()
+    .defer(d3.json, "https://ethangicker.cartodb.com/api/v2/sql?format=GeoJSON&q=SELECT * FROM cancer_deaths_by_100_000")
+    .defer(d3.json, 'na_land_clipped.json')
+    .await(makeMap);
+    
+    function makeMap (error, counties, na){
+                var breaks = ss.jenks(counties.features.map(function(d) { 
+            return d.properties.cancer_mor; 
+        }), 5);
+
+
+        breaks.shift(); 
+        breaks.pop(); 
+
+        
+
+        var colors = ["#feedde","#fdbe85","#fd8d3c","#e6550d","#a63603"];
+
+        var jenks = d3.scale.threshold()
+            .domain(breaks)
+            .range(colors);
+
+        svg.append("g")
+    .selectAll("path")
+    .data(na.features)
+    .enter()
+    .append("path")
+    .attr("d",geoPath)
+    .attr("class","land");
+          
+        svg.append("g")
+    .selectAll("path")
+    .data(counties.features)
+    .enter()
+    .append("path")
+    .attr( "d", geoPath )
+    .attr("class","county")
+    .attr("fill", function(d) {
+        return jenks(d.properties.cancer_mor);
+    });
+      
+}
+</script>
+</body>
+</html>
