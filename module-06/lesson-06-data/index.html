@@ -14,7 +14,7 @@
         margin: 0;
         background: #3d3d3d;
       }
-        html, body, #map, .map_wrapper {
+        html, body, #map {
         position: relative;
         height: 100%;
         padding: 0;
@@ -24,8 +24,9 @@
 </head>
 <body>
     
-    <div id="map"></div>
-    <div class="map_wrapper">
+    <div id="map">
+        <div id="legend"></div>
+    </div>
 
     <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
     <script type="cartocss/html" id=counties-styles>
@@ -76,7 +77,28 @@
             ]
             
         };
-            cartodb.createLayer(map, sourceObject).addTo(map)
+            cartodb.createLayer(map, sourceObject)
+                .addTo(map)
+                .on('done', function(l) {
+                
+                var legendData = [
+                    {name: '214 - 376', value: '#BD0026'},
+                     {name: '192 - 214', value: '#F03B20'},
+                     {name: '170 - 192', value: '#FD8D3C'},
+                     {name: '148 - 170', value: '#FECC5C'},
+                     {name: 'less than 148', value: '#FFFFB2'}
+                ];
+                
+                // Adds the custom legend
+                var customLegend = new cdb.geo.ui.Legend.Custom({
+                  title: "Cancer Mortality Rates per 100000 people",
+                  data: legendData
+                });
+
+                // append the rendered legend to the legend div
+                $('#legend').append(customLegend.render().$el);
+                
+            });
             
         
     </script>
